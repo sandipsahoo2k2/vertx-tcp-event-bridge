@@ -1,6 +1,6 @@
 # vertx-tcp-eventbus-bridge
 
-This is a TCP eventbus bridge implementation with SockJSHandler BridgeEvent
+This is a modfied TCP eventbus bridge implementation with TcpSocketEvent similar to the SockJSHandler BridgeEvent
 
     TcpSocketEvent {
       public String type();
@@ -22,3 +22,7 @@ Currently using this library we can get Socket "Open" and "Close" Events with Tc
         }
       });
 
+## Note
+
+Refer: https://github.com/vert-x3/vertx-tcp-eventbus-bridge for the actual implementations.
+I modified java library solely for my project where I had to listen to Socket Open and Close events as well with existing TcpEventBusBridge
