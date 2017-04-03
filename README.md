@@ -2,10 +2,10 @@
 
 This is a TCP eventbus bridge implementation with SockJSHandler BridgeEvent
 
-TcpSocketEvent {
-  public String type();
-  public NetSocket socket() ;
-}
+    TcpSocketEvent {
+      public String type();
+      public NetSocket socket() ;
+    }
 
 Currently using this library we can get Socket "Open" and "Close" Events with TcpEventBusBridge
 
@@ -21,7 +21,4 @@ Currently using this library we can get Socket "Open" and "Close" Events with Tc
             System.out.println("Event : " + socketEvent.type() + " : " + socketEvent.socket().writeHandlerID());
         }
       });
-
-```js
-```
 
