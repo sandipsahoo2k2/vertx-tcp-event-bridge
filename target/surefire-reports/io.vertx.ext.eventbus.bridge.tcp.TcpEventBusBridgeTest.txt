@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridgeTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.085 sec - in io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridgeTest

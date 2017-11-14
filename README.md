@@ -1,28 +1,79 @@
 # vertx-tcp-eventbus-bridge
 
-This is a modfied TCP eventbus bridge implementation with TcpSocketEvent similar to the SockJSHandler BridgeEvent
+This is a TCP eventbus bridge implementation.
 
-    TcpSocketEvent {
-      public String type();
-      public NetSocket socket() ;
-    }
 
-Currently using this library we can get Socket "Open" and "Close" Events with TcpEventBusBridge
+## The protocol
+
+The protocol is quite simple:
+
+* 4bytes int32 message length (big endian encoding)
+* json string (encoded in UTF-8)
+
+### Messages from the bridge -> client
+
+Every JSON message will include a `type` key, with a string
+value. Each type is shown below, along with the companion keys for
+that type:
+
+####  `type: "err"`
+
+* `message`: (string, required) The type of error, one of:
+  `"access_denied"`, `"address_required"`, `"unknown_address"`,
+  `"unknown_type"`
+
+#### `type: "message"`
+
+For a regular message, the object will also contain:
+
+* `address`: (string, required) Destination address.
+* `body`: (object, required) Message content as a JSON object.
+* `headers`: (object, optional) Headers as a JSON object with String values.
+* `replyAddress`: (string, optional) Address for replying to.
+* `send`: (boolean, required) Will be `true` if the message is a send, `false` if a publish.
+
+When a message from the client requests a reply, and that reply fails,
+the object will instead contain:
+
+* `failureCode`: (number, required) The failure code
+* `failureType`: (string, required) The failure name
+* `message`: (string, required) The message from the exception that signaled the failure
+
+### Messages from the client -> bridge
+
+The JSON object must contain a `type` key with a string value.  Each
+type is shown below, along with the companion keys for that type:
+
+#### `type: "send"`, `type: "publish"`
+
+* `address`: (string, required) Destination address
+* `body`: (object, required) Message content as a JSON object.
+* `headers`: (object, optional) Headers as a JSON object with String values.
+* `replyAddress`: (string, optional) Address for replying to.
+
+#### `type: "register"`, `type: "unregister"`
+
+* `address`: (string, required) Destination address
+* `headers`: (object, optional) Headers as a JSON object with String values.
+
+#### `type: "ping"`
+
+`ping` requires no additional keys.
 
 ## Example
 
-    TcpEventBusBridge bridge = TcpEventBusBridge.create(
-      vertx,
-      new BridgeOptions()
-        .addInboundPermitted(new PermittedOptions().setAddress("in"))
-        .addOutboundPermitted(new PermittedOptions().setAddress("out")), null, new Handler<TcpSocketEvent>() {
-        @Override
-        public void handle(TcpSocketEvent socketEvent) {
-            System.out.println("Event : " + socketEvent.type() + " : " + socketEvent.socket().writeHandlerID());
-        }
-      });
+An example nodejs client is provided as an example using the same API as SockJS bridge e.g.:
 
-## Note
+```js
+var EventBus = require('tcp-vertx-eventbus');
 
-Refer: https://github.com/vert-x3/vertx-tcp-eventbus-bridge for the actual implementations.
-I modified java library solely for my project where I had to listen to Socket Open and Close events as well with existing TcpEventBusBridge
+var eb = new EventBus('localhost', 7000);
+
+eb.onopen = function () {
+  // send a echo message
+  eb.send('echo', {value: 'vert.x'}, function (err, res) {
+    ...
+  });
+};
+```
+

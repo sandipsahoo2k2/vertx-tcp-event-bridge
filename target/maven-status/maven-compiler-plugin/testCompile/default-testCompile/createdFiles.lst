@@ -1,0 +1,3 @@
+io/vertx/ext/eventbus/bridge/tcp/TcpEventBusBridgeTest.class
+io/vertx/ext/eventbus/bridge/tcp/TcpEventBusBridgeEventTest.class
+io/vertx/ext/eventbus/bridge/tcp/TcpEventBusBridgeInteropTest.class

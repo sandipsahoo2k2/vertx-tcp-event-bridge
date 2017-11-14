@@ -47,13 +47,16 @@ public class TcpEventBusBridgeTest {
 
     vertx.eventBus().consumer("echo", (Message<JsonObject> msg) -> msg.reply(msg.body()));
 
+    vertx.setPeriodic(1000, __ -> vertx.eventBus().send("ping", new JsonObject().put("value", "hi")));
+
     TcpEventBusBridge bridge = TcpEventBusBridge.create(
             vertx,
             new BridgeOptions()
                     .addInboundPermitted(new PermittedOptions().setAddress("hello"))
                     .addInboundPermitted(new PermittedOptions().setAddress("echo"))
                     .addInboundPermitted(new PermittedOptions().setAddress("test"))
-                    .addOutboundPermitted(new PermittedOptions().setAddress("echo")));
+                    .addOutboundPermitted(new PermittedOptions().setAddress("echo"))
+                    .addOutboundPermitted(new PermittedOptions().setAddress("ping")));
 
     bridge.listen(7000, res -> {
       context.assertTrue(res.succeeded());
@@ -87,6 +90,93 @@ public class TcpEventBusBridgeTest {
   }
 
   @Test
+  public void testNoHandlers(TestContext context) {
+    // Send a request and get a response
+    NetClient client = vertx.createNetClient();
+    final Async async = context.async();
+
+    client.connect(7000, "localhost", conn -> {
+      context.assertFalse(conn.failed());
+
+      NetSocket socket = conn.result();
+
+      final FrameParser parser = new FrameParser(parse -> {
+        context.assertTrue(parse.succeeded());
+        JsonObject frame = parse.result();
+
+        context.assertEquals("err", frame.getString("type"));
+        context.assertEquals("#backtrack", frame.getString("address"));
+
+        client.close();
+        async.complete();
+      });
+
+      socket.handler(parser);
+
+      FrameHelper.sendFrame("send", "test", "#backtrack", new JsonObject().put("value", "vert.x"), socket);
+    });
+  }
+
+  @Test
+  public void testErrorReply(TestContext context) {
+    // Send a request and get a response
+    NetClient client = vertx.createNetClient();
+    final Async async = context.async();
+
+    vertx.eventBus().consumer("test", (Message<JsonObject> msg) -> {
+      msg.fail(0, "oops!");
+    });
+
+    client.connect(7000, "localhost", conn -> {
+      context.assertFalse(conn.failed());
+
+      NetSocket socket = conn.result();
+
+      final FrameParser parser = new FrameParser(parse -> {
+        context.assertTrue(parse.succeeded());
+        JsonObject frame = parse.result();
+
+        context.assertEquals("err", frame.getString("type"));
+        context.assertEquals("#backtrack", frame.getString("address"));
+
+        client.close();
+        async.complete();
+      });
+
+      socket.handler(parser);
+
+      FrameHelper.sendFrame("send", "test", "#backtrack", new JsonObject().put("value", "vert.x"), socket);
+    });
+  }
+
+  @Test
+  public void testSendsFromOtherSideOfBridge(TestContext context) {
+    NetClient client = vertx.createNetClient();
+    final Async async = context.async();
+
+    client.connect(7000, "localhost", conn -> {
+      context.assertFalse(conn.failed());
+
+      NetSocket socket = conn.result();
+
+      final FrameParser parser = new FrameParser(parse -> {
+        context.assertTrue(parse.succeeded());
+        JsonObject frame = parse.result();
+        context.assertNotEquals("err", frame.getString("type"));
+        context.assertEquals(true, frame.getBoolean("send"));
+        context.assertEquals("hi", frame.getJsonObject("body").getString("value"));
+        client.close();
+        async.complete();
+      });
+
+      socket.handler(parser);
+
+      FrameHelper.sendFrame("register", "ping", null, socket);
+    });
+
+  }
+
+  @Test
   public void testSendMessageWithReplyBacktrack(TestContext context) {
     // Send a request and get a response
     NetClient client = vertx.createNetClient();
@@ -101,6 +191,7 @@ public class TcpEventBusBridgeTest {
         context.assertTrue(parse.succeeded());
         JsonObject frame = parse.result();
         context.assertNotEquals("err", frame.getString("type"));
+        context.assertEquals(true, frame.getBoolean("send"));
         context.assertEquals("Hello vert.x", frame.getJsonObject("body").getString("value"));
         client.close();
         async.complete();
@@ -157,6 +248,7 @@ public class TcpEventBusBridgeTest {
         JsonObject frame = parse.result();
 
         context.assertNotEquals("err", frame.getString("type"));
+        context.assertEquals(false, frame.getBoolean("send"));
         context.assertEquals("Vert.x", frame.getJsonObject("body").getString("value"));
         client.close();
         async.complete();

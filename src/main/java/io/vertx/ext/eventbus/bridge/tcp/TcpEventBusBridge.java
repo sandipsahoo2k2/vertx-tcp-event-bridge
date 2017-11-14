@@ -33,22 +33,19 @@ import io.vertx.ext.eventbus.bridge.tcp.impl.TcpEventBusBridgeImpl;
 public interface TcpEventBusBridge {
 
   static TcpEventBusBridge create(Vertx vertx) {
-    return create(vertx, null, null, null);
+    return create(vertx, null, null);
   }
 
   static TcpEventBusBridge create(Vertx vertx, BridgeOptions options) {
-    return create(vertx, options, null, null);
+    return create(vertx, options, null);
   }
 
   static TcpEventBusBridge create(Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions) {
-    return create(vertx, options, netServerOptions, null);
+    return new TcpEventBusBridgeImpl(vertx, options, netServerOptions,null);
   }
-
-  static TcpEventBusBridge create(Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions, Handler<TcpSocketEvent> socketHandler) {
-    return new TcpEventBusBridgeImpl(vertx, options, netServerOptions, socketHandler);
+  static TcpEventBusBridge create(Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions,Handler<BridgeEvent> eventHandler) {
+    return new TcpEventBusBridgeImpl(vertx, options, netServerOptions,eventHandler);
   }
-
-
   /**
    * Listen on default port 7000
    *
@@ -121,5 +118,4 @@ public interface TcpEventBusBridge {
    * Close the current socket.
    */
   void close();
-
 }
