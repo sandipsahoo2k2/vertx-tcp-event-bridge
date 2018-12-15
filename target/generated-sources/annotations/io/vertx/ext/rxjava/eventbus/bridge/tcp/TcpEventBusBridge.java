@@ -20,7 +20,6 @@ import java.util.Map;
 import rx.Observable;
 import rx.Single;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.ext.bridge.BridgeOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -32,7 +31,7 @@ import io.vertx.core.Handler;
  * NOTE: This class has been automatically generated from the {@link io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge original} non RX-ified interface using Vert.x codegen.
  */
 
-@io.vertx.lang.rxjava.RxGen(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.class)
+@io.vertx.lang.rx.RxGen(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.class)
 public class TcpEventBusBridge {
 
   @Override
@@ -53,8 +52,7 @@ public class TcpEventBusBridge {
     return delegate.hashCode();
   }
 
-  public static final io.vertx.lang.rxjava.TypeArg<TcpEventBusBridge> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new TcpEventBusBridge((io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge) obj),
+  public static final io.vertx.lang.rx.TypeArg<TcpEventBusBridge> __TYPE_ARG = new io.vertx.lang.rx.TypeArg<>(    obj -> new TcpEventBusBridge((io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge) obj),
     TcpEventBusBridge::getDelegate
   );
 
@@ -68,25 +66,25 @@ public class TcpEventBusBridge {
     return delegate;
   }
 
-  public static TcpEventBusBridge create(Vertx vertx) { 
-    TcpEventBusBridge ret = TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate()));
+  public static io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge create(io.vertx.rxjava.core.Vertx vertx) { 
+    io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge ret = io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate()));
     return ret;
   }
 
-  public static TcpEventBusBridge create(Vertx vertx, BridgeOptions options) { 
-    TcpEventBusBridge ret = TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate(), options));
+  public static io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge create(io.vertx.rxjava.core.Vertx vertx, BridgeOptions options) { 
+    io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge ret = io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate(), options));
     return ret;
   }
 
-  public static TcpEventBusBridge create(Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions) { 
-    TcpEventBusBridge ret = TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate(), options, netServerOptions));
+  public static io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge create(io.vertx.rxjava.core.Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions) { 
+    io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge ret = io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate(), options, netServerOptions));
     return ret;
   }
 
-  public static TcpEventBusBridge create(Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions, Handler<BridgeEvent> eventHandler) { 
-    TcpEventBusBridge ret = TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate(), options, netServerOptions, new Handler<io.vertx.ext.eventbus.bridge.tcp.BridgeEvent>() {
+  public static io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge create(io.vertx.rxjava.core.Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions, Handler<io.vertx.ext.rxjava.eventbus.bridge.tcp.BridgeEvent> eventHandler) { 
+    io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge ret = io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge.create(vertx.getDelegate(), options, netServerOptions, new Handler<io.vertx.ext.eventbus.bridge.tcp.BridgeEvent>() {
       public void handle(io.vertx.ext.eventbus.bridge.tcp.BridgeEvent event) {
-        eventHandler.handle(BridgeEvent.newInstance(event));
+        eventHandler.handle(io.vertx.ext.rxjava.eventbus.bridge.tcp.BridgeEvent.newInstance(event));
       }
     }));
     return ret;
@@ -96,7 +94,7 @@ public class TcpEventBusBridge {
    * Listen on default port 7000
    * @return self
    */
-  public TcpEventBusBridge listen() { 
+  public io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge listen() { 
     delegate.listen();
     return this;
   }
@@ -106,11 +104,11 @@ public class TcpEventBusBridge {
    * @param handler the result handler
    * @return self
    */
-  public TcpEventBusBridge listen(Handler<AsyncResult<TcpEventBusBridge>> handler) { 
+  public io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge listen(Handler<AsyncResult<io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge>> handler) { 
     delegate.listen(new Handler<AsyncResult<io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge>>() {
       public void handle(AsyncResult<io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge> ar) {
         if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(TcpEventBusBridge.newInstance(ar.result())));
+          handler.handle(io.vertx.core.Future.succeededFuture(io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(ar.result())));
         } else {
           handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
         }
@@ -119,11 +117,11 @@ public class TcpEventBusBridge {
     return this;
   }
 
-  /**
+    /**
    * Listen on default port 7000 with a handler to report the state of the socket listen operation.
-   * @return 
+   * @return self
    */
-  public Single<TcpEventBusBridge> rxListen() { 
+  public Single<io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge> rxListen() { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       listen(fut);
     }));
@@ -135,7 +133,7 @@ public class TcpEventBusBridge {
    * @param address tcp address to the bind
    * @return self
    */
-  public TcpEventBusBridge listen(int port, String address) { 
+  public io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge listen(int port, String address) { 
     delegate.listen(port, address);
     return this;
   }
@@ -147,11 +145,11 @@ public class TcpEventBusBridge {
    * @param handler the result handler
    * @return self
    */
-  public TcpEventBusBridge listen(int port, String address, Handler<AsyncResult<TcpEventBusBridge>> handler) { 
+  public io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge listen(int port, String address, Handler<AsyncResult<io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge>> handler) { 
     delegate.listen(port, address, new Handler<AsyncResult<io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge>>() {
       public void handle(AsyncResult<io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge> ar) {
         if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(TcpEventBusBridge.newInstance(ar.result())));
+          handler.handle(io.vertx.core.Future.succeededFuture(io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(ar.result())));
         } else {
           handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
         }
@@ -160,13 +158,13 @@ public class TcpEventBusBridge {
     return this;
   }
 
-  /**
+    /**
    * Listen on specific port and bind to specific address
    * @param port tcp port
    * @param address tcp address to the bind
-   * @return 
+   * @return self
    */
-  public Single<TcpEventBusBridge> rxListen(int port, String address) { 
+  public Single<io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge> rxListen(int port, String address) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       listen(port, address, fut);
     }));
@@ -177,7 +175,7 @@ public class TcpEventBusBridge {
    * @param port tcp port
    * @return self
    */
-  public TcpEventBusBridge listen(int port) { 
+  public io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge listen(int port) { 
     delegate.listen(port);
     return this;
   }
@@ -188,11 +186,11 @@ public class TcpEventBusBridge {
    * @param handler the result handler
    * @return self
    */
-  public TcpEventBusBridge listen(int port, Handler<AsyncResult<TcpEventBusBridge>> handler) { 
+  public io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge listen(int port, Handler<AsyncResult<io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge>> handler) { 
     delegate.listen(port, new Handler<AsyncResult<io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge>>() {
       public void handle(AsyncResult<io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge> ar) {
         if (ar.succeeded()) {
-          handler.handle(io.vertx.core.Future.succeededFuture(TcpEventBusBridge.newInstance(ar.result())));
+          handler.handle(io.vertx.core.Future.succeededFuture(io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge.newInstance(ar.result())));
         } else {
           handler.handle(io.vertx.core.Future.failedFuture(ar.cause()));
         }
@@ -201,12 +199,12 @@ public class TcpEventBusBridge {
     return this;
   }
 
-  /**
+    /**
    * Listen on specific port
    * @param port tcp port
-   * @return 
+   * @return self
    */
-  public Single<TcpEventBusBridge> rxListen(int port) { 
+  public Single<io.vertx.ext.rxjava.eventbus.bridge.tcp.TcpEventBusBridge> rxListen(int port) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       listen(port, fut);
     }));
@@ -220,7 +218,7 @@ public class TcpEventBusBridge {
     delegate.close(handler);
   }
 
-  /**
+    /**
    * Close the current socket.
    * @return 
    */

@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(VertxUnitRunner.class)
 public class TcpEventBusBridgeEventTest {
@@ -111,7 +112,18 @@ public class TcpEventBusBridgeEventTest {
       NetSocket socket = conn.result();
 
       FrameHelper.sendFrame("send", "test", new JsonObject().put("value", "vert.x"), socket);
+      try {
+        TimeUnit.SECONDS.sleep(4);
+
       FrameHelper.sendFrame("ping", "hi", new JsonObject().put("value", "vert.x"), socket);
+
+        TimeUnit.SECONDS.sleep(2);
+
+        FrameHelper.sendFrame("ping", "hi", new JsonObject().put("value", "vert.x"), socket);
+
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     });
   }
 

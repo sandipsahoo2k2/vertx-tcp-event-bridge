@@ -57,20 +57,25 @@ import io.vertx.ext.eventbus.bridge.tcp.impl.protocol.FrameParser;
 public class TcpEventBusBridgeImpl implements TcpEventBusBridge {
 
   private static final Logger log = LoggerFactory.getLogger(TcpEventBusBridgeImpl.class);
+  public static final long DEFAULT_PING_TIMEOUT = 5000L;
+  public static final long DEFAULT_REPLY_TIMEOUT = 30000L;
 
   private final EventBus eb;
   private final NetServer server;
 
+  private final Map<NetSocket, TcpEventBusBridgeImpl.SockInfo> sockInfos = new HashMap();
   private final Map<String, Pattern> compiledREs = new HashMap<>();
   private final BridgeOptions options;
   private final Handler<BridgeEvent> bridgeEventHandler;
-
+  private final long pingTimeout;
+  private final Vertx vertx;
 
   public TcpEventBusBridgeImpl(Vertx vertx, BridgeOptions options, NetServerOptions netServerOptions, Handler<BridgeEvent> eventHandler) {
+    this.vertx = vertx;
     this.eb = vertx.eventBus();
     this.options = options != null ? options : new BridgeOptions();
     this.bridgeEventHandler = eventHandler;
-
+    this.pingTimeout = DEFAULT_PING_TIMEOUT;
     server = vertx.createNetServer(netServerOptions == null ? new NetServerOptions() : netServerOptions);
     server.connectHandler(this::handler);
   }
@@ -132,6 +137,22 @@ public class TcpEventBusBridgeImpl implements TcpEventBusBridge {
       }
     });
     return this;
+  }
+
+  private static final class SockInfo {
+    int handlerCount;
+    TcpEventBusBridgeImpl.PingInfo pingInfo;
+
+    private SockInfo() {
+    }
+  }
+
+  private static final class PingInfo {
+    long lastPing;
+    long timerID;
+
+    private PingInfo() {
+    }
   }
 
   private void doSendOrPub(boolean send, NetSocket socket, String address, JsonObject msg, Map<String,
@@ -237,6 +258,19 @@ public class TcpEventBusBridgeImpl implements TcpEventBusBridge {
       return new BridgeEventImpl(BridgeEventType.SOCKET_CREATED, (JsonObject)null, socket);
     }, (Runnable)null, (Runnable)null);
 
+    TcpEventBusBridgeImpl.PingInfo pingInfo = new TcpEventBusBridgeImpl.PingInfo();
+    pingInfo.timerID = this.vertx.setPeriodic(this.pingTimeout, (id) -> {
+      if(System.currentTimeMillis() - pingInfo.lastPing >= this.pingTimeout) {
+        this.checkCallHook(() -> {
+          return new BridgeEventImpl(BridgeEventType.SOCKET_IDLE, (JsonObject)null, socket);
+        }, (Runnable)null, (Runnable)null);
+        socket.close();
+      }
+    });
+    TcpEventBusBridgeImpl.SockInfo sockInfo = new TcpEventBusBridgeImpl.SockInfo();
+    sockInfo.pingInfo = pingInfo;
+    this.sockInfos.put(socket, sockInfo);
+
     // create a protocol parser
     final FrameParser parser = new FrameParser(res -> {
       if (res.failed()) {
@@ -278,6 +312,15 @@ public class TcpEventBusBridgeImpl implements TcpEventBusBridge {
       log.error(t.getMessage(), t);
       registry.values().forEach(MessageConsumer::unregister);
       registry.clear();
+
+      TcpEventBusBridgeImpl.SockInfo info = (TcpEventBusBridgeImpl.SockInfo)this.sockInfos.remove(socket);
+      if(info != null) {
+        TcpEventBusBridgeImpl.PingInfo pingInfo2 = info.pingInfo;
+        if(pingInfo2 != null) {
+          this.vertx.cancelTimer(pingInfo2.timerID);
+        }
+      }
+
       this.checkCallHook(() -> {
         return new BridgeEventImpl(BridgeEventType.SOCKET_CLOSED, (JsonObject)null, socket);
       }, (Runnable)null, (Runnable)null);
@@ -287,6 +330,15 @@ public class TcpEventBusBridgeImpl implements TcpEventBusBridge {
     socket.endHandler(v -> {
       registry.values().forEach(MessageConsumer::unregister);
       registry.clear();
+
+      TcpEventBusBridgeImpl.SockInfo info = (TcpEventBusBridgeImpl.SockInfo)this.sockInfos.remove(socket);
+      if(info != null) {
+        TcpEventBusBridgeImpl.PingInfo pingInfo3 = info.pingInfo;
+        if(pingInfo3 != null) {
+          this.vertx.cancelTimer(pingInfo3.timerID);
+        }
+      }
+
       this.checkCallHook(() -> {
         return new BridgeEventImpl(BridgeEventType.SOCKET_CLOSED, (JsonObject)null, socket);
       }, (Runnable)null, (Runnable)null);
@@ -294,9 +346,13 @@ public class TcpEventBusBridgeImpl implements TcpEventBusBridge {
   }
 
   private void internalHandlePing(NetSocket sock) {
-    this.checkCallHook(() -> {
-      return new BridgeEventImpl(BridgeEventType.SOCKET_PING, (JsonObject)null, sock);
-    }, (Runnable)null, (Runnable)null);
+    TcpEventBusBridgeImpl.SockInfo info = (TcpEventBusBridgeImpl.SockInfo)this.sockInfos.get(sock);
+    if(info != null) {
+      info.pingInfo.lastPing = System.currentTimeMillis();
+      this.checkCallHook(() -> {
+        return new BridgeEventImpl(BridgeEventType.SOCKET_PING, (JsonObject)null, sock);
+      }, (Runnable)null, (Runnable)null);
+    }
   }
 
   @Override
